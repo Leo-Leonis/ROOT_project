@@ -23,7 +23,7 @@ public:
 };
 
 /// @brief It describes the type of the particle and holds
-/// the cinematic parameters of the particle.
+/// the cinematic properties of the particle.
 class Particle
 {
 private:
