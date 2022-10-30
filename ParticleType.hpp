@@ -10,7 +10,7 @@ private:
   const std::string fName;
   /// @brief the MASS of the particle associated.
   const double fMass;
-  /// @brief The Charge of the particle associated.
+  /// @brief The CHARGE of the particle associated.
   const int fCharge;
 
 public:

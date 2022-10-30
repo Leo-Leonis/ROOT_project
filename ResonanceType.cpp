@@ -9,5 +9,5 @@ ResonanceType::ResonanceType(std::string name, double mass, int charge, double w
 void ResonanceType::Print() const
 {
   ParticleType::Print();
-  std::cout << " width: " << fWidth << '\n';
+  std::cout << "  | width: " << fWidth << " GeV/c2" << '\n';
 }
