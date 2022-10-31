@@ -8,17 +8,17 @@
 #include <vector>
 
 /// @brief A type representing a 3d vector.
-class vector3d {
+class Vector3d {
 public:
   double x;
   double y;
   double z;
 
-  /// @brief Constructor of vector3d.
-  vector3d(double i, double j, double k) : x{i}, y{j}, z{k} {}
+  /// @brief Constructor of Vector3d.
+  Vector3d(double i, double j, double k) : x{i}, y{j}, z{k} {}
 
   /// @brief Computes and returns the module of the vector.
-  double module() const { return std::sqrt(x * x + y * y + z * z); }
+  double GetModule() const { return std::sqrt(x * x + y * y + z * z); }
 };
 
 /// @brief It describes the type of the particle and holds
@@ -42,7 +42,7 @@ private:
   int fIndex;
 
   /// @brief A 3d vector corresponding to the impulse vector.
-  vector3d fImpulse;
+  Vector3d fImpulse;
 
   /// @brief This function searches for the corresponding
   /// number type of the particle through all the types present
@@ -98,7 +98,7 @@ public:
 
   double GetzImpulse() const { return fImpulse.z; }
 
-  vector3d GetImpulse() const { return fImpulse; }
+  Vector3d GetImpulse() const { return fImpulse; }
 
   double GetMass() const { return fParticleType[fIndex]->GetMass(); }
 
@@ -112,8 +112,8 @@ public:
   double InvMass(Particle &p) const;
 
   /// @brief Manually sets the impulse vector.
-  /// @param px The x component of the new impulse 
-  /// @param py The y component of the new impulse 
+  /// @param px The x component of the new impulse
+  /// @param py The y component of the new impulse
   /// @param pz The z component of the new impulse
   void SetP(double px, double py, double pz);
 };

@@ -1,16 +1,16 @@
 #include "Particle.hpp"
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <iostream>
-#include <cassert>
 #include <stdexcept>
 
 /// @brief Computes and returns a vectorial sum with another vector.
 /// @param v1 first vector
 /// @param v2 seconde vector
 /// @return the vectorial sum of the two vectors.
-vector3d ComputeSum(vector3d const &v1, vector3d const &v2) {
-  return vector3d(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+Vector3d ComputeSum(Vector3d const &v1, Vector3d const &v2) {
+  return Vector3d(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
 
 /// @brief A static integer counter that gives the
@@ -23,7 +23,7 @@ std::vector<ParticleType *> Particle::fParticleType{};
 
 int Particle::FindParticle(std::string part_name) {
   int i = 0;
-  for (ParticleType* part_ptr : fParticleType) {
+  for (ParticleType *part_ptr : fParticleType) {
     if (part_name == part_ptr->GetName()) {
       return i;
       break;
@@ -37,7 +37,8 @@ Particle::Particle(std::string part_name, double Px, double Py, double Pz)
   int part_index = FindParticle(part_name);
   if (part_index == -1) {
     std::cout << "BREAKING NEWS: FOUND NEW PARTICLE!!!" << '\n';
-  } else fIndex = part_index;
+  } else
+    fIndex = part_index;
 }
 
 void Particle::AddParticleType(std::string part_name, double mass, int charge) {
@@ -107,13 +108,13 @@ void Particle::PrintParticleData() const {
 
 double Particle::GetEnergy() const {
   return std::sqrt(std::pow(fParticleType[fIndex]->GetMass(), 2) +
-                   std::pow(fImpulse.module(), 2));
+                   std::pow(fImpulse.GetModule(), 2));
 }
 
 double Particle::InvMass(Particle &p) const {
   return std::sqrt(
       std::pow(this->GetEnergy() + p.GetEnergy(), 2) -
-      std::pow((ComputeSum(fImpulse, p.GetImpulse())).module(), 2));
+      std::pow((ComputeSum(fImpulse, p.GetImpulse())).GetModule(), 2));
 }
 
 void Particle::SetP(double px, double py, double pz) {
