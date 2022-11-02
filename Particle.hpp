@@ -59,6 +59,11 @@ private:
 
 public:
   /////////////////////////////////////////////
+  /// @brief Default constructor of class Particle.
+  ///////////////// ////////////////////////////
+  Particle();
+
+  /////////////////////////////////////////////
   /// @brief Constructor of class Particle.
   /// @param part_name The name type of the particle
   /// @param Px The x component of the impulse
