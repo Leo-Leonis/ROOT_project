@@ -51,6 +51,12 @@ private:
   /// @return The integer corrisponding to the particle type.
   int static FindParticle(std::string part_name);
 
+  /// @brief Function used in Decay2Body to simulate a Lorentz transfomation
+  /// @param bx Component x
+  /// @param by Component y
+  /// @param bz Component z
+  void Boost(double bx, double by, double bz);
+
 public:
   /////////////////////////////////////////////
   /// @brief Constructor of class Particle.
@@ -72,7 +78,6 @@ public:
   /// @param mass The mass of the new particle
   /// @param charge The charge of the new particle
   /// @param width The resonance width of the new particle (if it exists)
-  /////////////////////////////////////////////
   static void AddParticleType(std::string part_name, double mass, int charge,
                               double width);
 
@@ -91,15 +96,10 @@ public:
   void PrintParticleData() const;
 
   int GetIndex() const { return fIndex; }
-
   double GetxImpulse() const { return fImpulse.x; }
-
   double GetyImpulse() const { return fImpulse.y; }
-
   double GetzImpulse() const { return fImpulse.z; }
-
   Vector3d GetImpulse() const { return fImpulse; }
-
   double GetMass() const { return fParticleType[fIndex]->GetMass(); }
 
   /// @brief Computes and returns the energy stored in the particle.
@@ -116,6 +116,14 @@ public:
   /// @param py The y component of the new impulse
   /// @param pz The z component of the new impulse
   void SetP(double px, double py, double pz);
+
+  /// @brief This function simulates through a random generator the cinematics
+  /// of the decay of the particle into other two.
+  /// @param dau1 The first particle it decays into
+  /// @param dau2 The seconde particle it decays into
+  /// @return Returns 0 if it was successful, any other value greater than 0 if
+  /// not successful.
+  int Decay2Body(Particle &dau1, Particle &dau2) const;
 };
 
 #endif
