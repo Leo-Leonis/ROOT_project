@@ -29,6 +29,7 @@ int Particle::FindParticle(std::string part_name) {
       return i;
       break;
     }
+    i++;
   }
   return -1;
 }
@@ -37,17 +38,24 @@ Particle::Particle(std::string part_name, double Px, double Py, double Pz)
     : fImpulse(Px, Py, Pz) {
   int part_index = FindParticle(part_name);
   if (part_index == -1) {
-    std::cout << "BREAKING NEWS: FOUND NEW PARTICLE!!!" << '\n';
+    std::cout << "Warning: trying to add a particle whose type name was not "
+                 "identified."
+              << '\n';
   } else
     fIndex = part_index;
 }
 
 void Particle::AddParticleType(std::string part_name, double mass, int charge) {
   if (FindParticle(part_name) == -1 &&
-      fNParticleTypes != fMaxNumParticleTypes) {
+      fNParticleTypes != fMaxNumParticleTypes + 1) {
     fNParticleTypes++;
     ParticleType *toBeAddedPart = new ParticleType(part_name, mass, charge);
     fParticleType.push_back(toBeAddedPart);
+  }else if (fNParticleTypes == fMaxNumParticleTypes + 1) {
+    throw std::runtime_error("ERROR: maximum number of particles reached.");
+  } else {
+    throw std::runtime_error(
+        "WARNING: trying to add a type that already exists.");
   }
 }
 
@@ -61,6 +69,9 @@ void Particle::AddParticleType(std::string part_name, double mass, int charge,
     fParticleType.push_back(toBeAddedPart);
   } else if (fNParticleTypes == fMaxNumParticleTypes + 1) {
     throw std::runtime_error("ERROR: maximum number of particles reached.");
+  } else {
+    throw std::runtime_error(
+        "WARNING: trying to add a type that already exists.");
   }
 }
 
