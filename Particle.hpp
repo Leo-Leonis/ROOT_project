@@ -106,13 +106,14 @@ public:
   double GetzImpulse() const { return fImpulse.z; }
   Vector3d GetImpulse() const { return fImpulse; }
   double GetMass() const { return fParticleType[fIndex]->GetMass(); }
+  double GetCharge() const { return fParticleType[fIndex]->GetCharge(); }
 
   /// @brief Computes and returns the energy stored in the particle.
   /// @return A double containing the energy of the particle.
   double GetEnergy() const;
 
   /// @brief Computes and returns the invariant mass between two particles.
-  /// @param p The second particle pointer to be compared to
+  /// @param p The second particle to be compared to
   /// @return A double containing the invariant mass.
   double InvMass(Particle &p) const;
 
@@ -126,7 +127,7 @@ public:
   /// of the decay of the particle into other two.
   /// @param dau1 The first particle it decays into
   /// @param dau2 The seconde particle it decays into
-  /// @return Returns 0 if it was successful, any other value greater than 0 if
+  /// @return Returns 0 if it was successful, any other value if
   /// not successful.
   int Decay2Body(Particle &dau1, Particle &dau2) const;
 };
