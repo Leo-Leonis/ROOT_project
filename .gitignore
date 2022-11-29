@@ -4,3 +4,4 @@ main
 *.pcm
 *.d
 *.so
+*.exe

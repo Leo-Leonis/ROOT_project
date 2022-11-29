@@ -4,17 +4,20 @@
 
 #include "TCanvas.h"
 #include "TH1D.h"
+#include "TH1I.h"
 #include "TList.h"
 #include "TMath.h"
 #include "TRandom.h"
 
+#include <iostream>
 #include <stdexcept>
 
-R__LOAD_LIBRARY(Particle_cpp.so)
-R__LOAD_LIBRARY(ResonanceType_cpp.so)
 R__LOAD_LIBRARY(ParticleType_cpp.so)
+R__LOAD_LIBRARY(ResonanceType_cpp.so)
+R__LOAD_LIBRARY(Particle_cpp.so)
 
-int main() {
+// int main () {
+void program() {
   gRandom->SetSeed();
 
   Particle::AddParticleType("pi+", 0.13957, 1);       // index 0
@@ -25,7 +28,7 @@ int main() {
   Particle::AddParticleType("p-", 0.93827, -1);       // index 5
   Particle::AddParticleType("K*", 0.89166, 0, 0.050); // index 6
 
-  int const nEvents = 10E5;               // total number of events
+  int const nEvents = 1E5;               // total number of events
   int const NParticles = 100;             // number of initial particles
   int const NMaxParticles = 120;          // max number of particles
   Particle EventParticles[NMaxParticles]; // array of generated particles
@@ -42,29 +45,23 @@ int main() {
   TH1D *hEnergy =
       new TH1D("henergy", "Particle energy distribution", 100, 1, 5);
 
-  TList *listInvMass = new TList();
   TH1D *hTotInvMass = new TH1D(
       "htotInvMass", "Invariant Mass of all particles distribution", 100, 0, 3);
-  listInvMass->Add(hTotInvMass);
   TH1D *hInvMass = new TH1D(
       "hinvMass", "Invariant Mass of same charge distribution", 100, 0, 3);
-  listInvMass->Add(hInvMass);
   TH1D *hInvMassOpp = new TH1D(
       "hinvMassOpp", "Invariant Mass of oppos. charge distr.", 100, 0, 3);
-  listInvMass->Add(hInvMassOpp);
   TH1D *hInvMassKpi = new TH1D(
       "hinvMassKpi", "Invariant Mass of same charge between K and pi distr.",
       100, 0, 3);
-  listInvMass->Add(hInvMassKpi);
   TH1D *hInvMassOppKpi = new TH1D(
       "hinvMassOppKpi",
       "Invariant Mass of oppos. charge between K and pi distr.", 100, 0, 3);
-  listInvMass->Add(hInvMassOppKpi);
   TH1D *hInvMassControl = new TH1D(
       "hinvMassControl", "Invariant Mass control distribution", 100, 0, 2);
-  listInvMass->Add(hInvMassControl);
 
-  TCanvas *maicanvas = new TCanvas();
+  TCanvas *canvas = new TCanvas("c1", "c1", 1080, 720);
+  TCanvas *canvasInvMass = new TCanvas("c2", "c2", 1080, 720);
 
   // In each event...
   for (int n_ev = 0; n_ev != nEvents; n_ev++) {
@@ -139,7 +136,7 @@ int main() {
     for (Particle p : EventParticles) {
 
       // skip the fist iteration
-      if (part_n = 0) {
+      if (part_n == 0) {
         part_n++;
         continue;
       }
@@ -157,7 +154,7 @@ int main() {
             continue;
           }
           // ...otherwise
-          
+
           // fill hTotInvMass
           hTotInvMass->Fill(p.InvMass(EventParticles[sub_i]));
 
@@ -187,6 +184,41 @@ int main() {
       // next particle
       part_n++;
     } // end invariant mass calculation
-  }   // end event generatiorns loop
-  return 0;
+
+    // print number of progression in order to give feedback
+    std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+              << "events generated: " << n_ev << '(' << 100 * n_ev / nEvents << "%)";
+  } // end event generations loop
+
+  std::cout << '\n';
+  canvas->Divide(2, 3);
+  canvasInvMass->Divide(2, 3);
+
+  canvas->cd(1);
+  hIndex->Draw();
+  canvas->cd(2);
+  hPhi->Draw();
+  canvas->cd(3);
+  hTheta->Draw();
+  canvas->cd(4);
+  hImpModule->Draw();
+  canvas->cd(5);
+  hTrasvImpModule->Draw();
+  canvas->cd(6);
+  hEnergy->Draw();
+
+  canvasInvMass->cd(1);
+  hTotInvMass->Draw();
+  canvasInvMass->cd(2);
+  hInvMass->Draw();
+  canvasInvMass->cd(3);
+  hInvMassOpp->Draw();
+  canvasInvMass->cd(4);
+  hInvMassKpi->Draw();
+  canvasInvMass->cd(5);
+  hInvMassOppKpi->Draw();
+  canvasInvMass->cd(6);
+  hInvMassControl->Draw();
+
+  // return 0;
 }

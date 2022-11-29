@@ -14,6 +14,9 @@ public:
   double y;
   double z;
 
+  /// @brief Default constructor of Vector3d.
+  Vector3d() {};
+
   /// @brief Constructor of Vector3d.
   Vector3d(double i, double j, double k) : x{i}, y{j}, z{k} {}
 
@@ -61,7 +64,7 @@ public:
   /////////////////////////////////////////////
   /// @brief Default constructor of class Particle.
   ///////////////// ////////////////////////////
-  Particle();
+  Particle() {};
 
   /////////////////////////////////////////////
   /// @brief Constructor of class Particle.
