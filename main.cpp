@@ -20,15 +20,15 @@ R__LOAD_LIBRARY(Particle_cpp.so)
 void program() {
   gRandom->SetSeed();
 
-  Particle::AddParticleType("pi+", 0.13957, 1);       // index 0
-  Particle::AddParticleType("pi-", 0.13957, -1);      // index 1
-  Particle::AddParticleType("K+", 0.49367, 1);        // index 2
-  Particle::AddParticleType("K-", 0.49367, -1);       // index 3
-  Particle::AddParticleType("p+", 0.93827, 1);        // index 4
-  Particle::AddParticleType("p-", 0.93827, -1);       // index 5
-  Particle::AddParticleType("K*", 0.89166, 0, 0.050); // index 6
+  Particle::AddParticleType("pi+", 0.13957, 1);                     // index 0
+  Particle::AddParticleType("pi-", 0.13957, -1);                    // index 1
+  Particle::AddParticleType("K+", 0.49367, 1);                      // index 2
+  Particle::AddParticleType("K-", 0.49367, -1);                     // index 3
+  Particle::AddParticleType("p+", 0.93827, 1); // index 4
+  Particle::AddParticleType("p-", 0.93827, -1);                     // index 5
+  Particle::AddParticleType("K*", 0.89166, 0, 0.050);               // index 6
 
-  int const nEvents = 1E5;               // total number of events
+  int const nEvents = 1E5;                // total number of events
   int const NParticles = 100;             // number of initial particles
   int const NMaxParticles = 120;          // max number of particles
   Particle EventParticles[NMaxParticles]; // array of generated particles
@@ -103,15 +103,17 @@ void program() {
       } else {
         EventParticles[i].SetIndex(6); // K*
         if (EventParticles[i].Decay2Body(
-                EventParticles[NParticles + n_decays + 1],
-                EventParticles[NParticles + n_decays + 2]) != 0) {
-          throw std::runtime_error("Decay of a particle was unsuccessful.");
+                EventParticles[NParticles + (n_decays * 2) + 1],
+                EventParticles[NParticles + (n_decays * 2) + 2]) != 0) {
+          throw std::runtime_error("Decay of a particle K* was unsuccessful.");
         } else {
           double random_n = gRandom->Rndm();
           if (random_n < 0.5) {
+            // pi+ and K-
             EventParticles[NParticles + (n_decays * 2) + 1].SetIndex(0);
             EventParticles[NParticles + (n_decays * 2) + 2].SetIndex(3);
           } else {
+            // pi- and K+
             EventParticles[NParticles + (n_decays * 2) + 1].SetIndex(1);
             EventParticles[NParticles + (n_decays * 2) + 2].SetIndex(2);
           }
@@ -133,61 +135,76 @@ void program() {
     int nKstars = 0;
 
     // invariant mass calculations
-    for (Particle p : EventParticles) {
+    // TODO: correggere il range del loop utilizzando il contatore di particelle
+    // generate.
+    for (int part_n = 0; part_n != NParticles + n_decays; part_n++) {
 
       // skip the fist iteration
       if (part_n == 0) {
-        part_n++;
         continue;
       }
 
-      // if the particle is a K*, fill the controll histogram, otherwise skip
-      if (p.GetIndex() == 6) {
-        hInvMassControl->Fill(EventParticles[NParticles + nKstars + 1].InvMass(
-            EventParticles[NParticles + nKstars + 2]));
-        nKstars += 2;
+      int curr_indx =
+          EventParticles[part_n].GetIndex(); // current particle index
+      int curr_charge =
+          EventParticles[part_n].GetCharge(); // current particle charge
+
+      // if the particle is a K*, fill the control histogram, otherwise skip
+      if (curr_indx == 6) {
+        hInvMassControl->Fill(
+            EventParticles[NParticles + (nKstars * 2) + 1].InvMass(
+                EventParticles[NParticles + (nKstars * 2) + 2]));
+        nKstars++;
       } else {
         for (int sub_i = 0; sub_i != part_n; sub_i++) {
 
+          int tobe_indx =
+              EventParticles[sub_i].GetIndex(); // to be compared particle index
+          int tobe_charge = EventParticles[sub_i]
+                                .GetCharge(); // to be compared particle charge
+
           // if the particle TO BE COMPARED is a K*, skip...
-          if (EventParticles[sub_i].GetIndex() == 6) {
+          if (tobe_indx == 6) {
             continue;
           }
           // ...otherwise
 
           // fill hTotInvMass
-          hTotInvMass->Fill(p.InvMass(EventParticles[sub_i]));
+          hTotInvMass->Fill(
+              EventParticles[part_n].InvMass(EventParticles[sub_i]));
 
           // IF same charge fill InvMass, otherwise fill InvMassOpp
-          if (p.GetCharge() * EventParticles[sub_i].GetCharge() == 1) {
-            hInvMass->Fill(p.InvMass(EventParticles[sub_i]));
+          if (curr_charge * tobe_charge == 1) {
+            hInvMass->Fill(
+                EventParticles[part_n].InvMass(EventParticles[sub_i]));
           } else {
-            hInvMassOpp->Fill(p.InvMass(EventParticles[sub_i]));
+            hInvMassOpp->Fill(
+                EventParticles[part_n].InvMass(EventParticles[sub_i]));
           }
 
           // IF K and pi
-          if (((p.GetIndex() == 0 || p.GetIndex() == 1) &&
-               (EventParticles[sub_i].GetIndex() == 2 ||
-                EventParticles[sub_i].GetIndex() == 3)) ||
-              ((p.GetIndex() == 2 || p.GetIndex() == 3) &&
-               (EventParticles[sub_i].GetIndex() == 0 ||
-                EventParticles[sub_i].GetIndex() == 1))) {
+          if (((curr_indx == 0 || curr_indx == 1) &&
+               (tobe_indx == 2 || tobe_indx == 3)) ||
+              ((curr_indx == 2 || curr_indx == 3) &&
+               (tobe_indx == 0 || tobe_indx == 1))) {
             // IF same charge fill InvMassKpi, otherwise fill InvMassOppKpi
-            if (p.GetCharge() * EventParticles[sub_i].GetCharge() == 1) {
-              hInvMassKpi->Fill(p.InvMass(EventParticles[sub_i]));
+            if (curr_charge * tobe_charge == 1) {
+              hInvMassKpi->Fill(
+                  EventParticles[part_n].InvMass(EventParticles[sub_i]));
             } else {
-              hInvMassOppKpi->Fill(p.InvMass(EventParticles[sub_i]));
+              hInvMassOppKpi->Fill(
+                  EventParticles[part_n].InvMass(EventParticles[sub_i]));
             }
           }
         }
       }
-      // next particle
-      part_n++;
     } // end invariant mass calculation
 
     // print number of progression in order to give feedback
-    std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-              << "events generated: " << n_ev << '(' << 100 * n_ev / nEvents << "%)";
+    std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
+                 "\b\b\b\b\b\b\b\b\b\b\b\b"
+              << "events generated: " << n_ev << '(' << 100 * n_ev / nEvents
+              << "%)";
   } // end event generations loop
 
   std::cout << '\n';
