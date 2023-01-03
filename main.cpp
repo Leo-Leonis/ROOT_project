@@ -35,37 +35,37 @@ void program() {
   int const NMaxParticles = 120; // max number of particles allowed per event
   Particle EventParticles[NMaxParticles]; // main array of generated particles
 
-  TH1I *hIndex = new TH1I("hpartTypes", "Particle type distribution", 7, 0, 7);
+  TH1I *hIndex = new TH1I("hIndex", "Particle type distribution", 7, 0, 7);
   TH1D *hPhi =
-      new TH1D("hphi", "Azimutal angle distribution", 500, 0, TMath::TwoPi());
+      new TH1D("hPhi", "Azimutal angle distribution", 500, 0, TMath::TwoPi());
   TH1D *hTheta =
-      new TH1D("htheta", "Polar angle distribution", 500, 0, TMath::Pi());
+      new TH1D("hTheta", "Polar angle distribution", 500, 0, TMath::Pi());
   TH1D *hImpModule =
-      new TH1D("himpModule", "Impulse module distribution", 100, 0, 6);
-  TH1D *hTrasvImpModule = new TH1D(
-      "htrasvImpModule", "Trasverse impulse module distribution", 100, 0, 6);
+      new TH1D("hImpModule", "Impulse module distribution", 100, 0, 6);
+  TH1D *hTransvImpModule = new TH1D(
+      "hTransvImpModule", "Transverse impulse module distribution", 100, 0, 6);
   TH1D *hEnergy =
-      new TH1D("henergy", "Particle energy distribution", 100, 0, 5);
+      new TH1D("hEnergy", "Particle energy distribution", 100, 0, 5);
 
   TH1D *hTotInvMass = new TH1D(
-      "htotInvMass", "Invariant Mass of all particles distribution", 100, 0, 3);
+      "hTotInvMass", "Invariant Mass of all particles distribution", 100, 0, 3);
   hTotInvMass->Sumw2();
   TH1D *hInvMass = new TH1D(
-      "hinvMass", "Invariant Mass of same charge distribution", 100, 0, 3);
+      "hInvMass", "Invariant Mass of same charge distribution", 100, 0, 3);
   hInvMass->Sumw2();
   TH1D *hInvMassOpp = new TH1D(
-      "hinvMassOpp", "Invariant Mass of oppos. charge distr.", 100, 0, 3);
+      "hInvMassOpp", "Invariant Mass of oppos. charge distr.", 100, 0, 3);
   hInvMassOpp->Sumw2();
   TH1D *hInvMassKpi = new TH1D(
-      "hinvMassKpi", "Invariant Mass of same charge between K and pi distr.",
+      "hInvMassKpi", "Invariant Mass of same charge between K and pi distr.",
       100, 0, 3);
   hInvMassKpi->Sumw2();
   TH1D *hInvMassOppKpi = new TH1D(
-      "hinvMassOppKpi",
+      "hInvMassOppKpi",
       "Invariant Mass of oppos. charge between K and pi distr.", 100, 0, 3);
   hInvMassOppKpi->Sumw2();
   TH1D *hInvMassControl = new TH1D(
-      "hinvMassControl", "Invariant Mass control distribution", 100, 0, 2);
+      "hInvMassControl", "Invariant Mass control distribution", 100, 0, 2);
   hInvMassControl->Sumw2();
 
   TCanvas *canvas = new TCanvas("c1", "c1", 1080, 720);
@@ -140,7 +140,7 @@ void program() {
       hPhi->Fill(phi);
       hTheta->Fill(theta);
       hImpModule->Fill(imp_mod);
-      hTrasvImpModule->Fill(TMath::Sin(theta) * imp_mod);
+      hTransvImpModule->Fill(TMath::Sin(theta) * imp_mod);
       hEnergy->Fill(EventParticles[i].GetEnergy());
     } // end particle generations loop per event
 
@@ -227,7 +227,7 @@ void program() {
   canvas->cd(4);
   hImpModule->Draw();
   canvas->cd(5);
-  hTrasvImpModule->Draw();
+  hTransvImpModule->Draw();
   canvas->cd(6);
   hEnergy->Draw();
 
