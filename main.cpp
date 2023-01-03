@@ -20,6 +20,7 @@ R__LOAD_LIBRARY(Particle_cpp.so)
 // int main () {
 void program() {
   gRandom->SetSeed();
+  TFile *resultFile = new TFile("result.root", "RECREATE");
 
   Particle::AddParticleType("pi+", 0.13957, 1);       // index 0
   Particle::AddParticleType("pi-", 0.13957, -1);      // index 1
@@ -212,6 +213,8 @@ void program() {
   } // end event generations loop
 
   std::cout << '\n';
+
+
   canvas->Divide(2, 3);
   canvasInvMass->Divide(2, 3);
 
@@ -239,11 +242,10 @@ void program() {
   canvasInvMass->cd(5);
   hInvMassOppKpi->Draw();
   canvasInvMass->cd(6);
+  hInvMassControl->Fit("gaus"); // fit the control histogram
   hInvMassControl->Draw();
 
   // return 0;
 
-  TFile *resultFile = new TFile("result.root", "RECREATE");
   resultFile->Write();
-  resultFile->Close();
 }
