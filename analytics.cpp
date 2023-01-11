@@ -4,12 +4,11 @@
 
 #include <iostream>
 
-/// @brief Check the expected entries of an histogram with an accepted range,
+/// @brief Check the entries of an histogram with an accepted range,
 /// and prints out the results.
 /// @param histo the histogram pointer
 /// @param expEntries the number of expected entries
-/// @param range the maximum accepted distance of the number of entries from the
-/// expected one
+/// @param range the accepted error range
 void check_entries(TH1 *histo, int expEntries, int range) {
   int entries = histo->GetEntries(); // number of entries
 
@@ -36,9 +35,28 @@ void check_entries(TH1 *histo, int expEntries, int range) {
   }
 }
 
+/// @brief Function that checks the number of entries of a specified bin.
+/// @param histo the histogram pointer
+/// @param bin the number associated to the bin
+/// @param expEntries the number of expected entries
+/// @param range the accepted error range
+void check_bin_entries(TH1 *histo, int bin, int expEntries, int range) {
+  int entries = histo->GetBinContent(bin);
+  std::cout << "INFO: checking " << histo->GetName() << ", bin " << bin
+            << "... ";
+  if (entries >= expEntries - range && entries <= expEntries + range) {
+    std::cout << "correct! (" << entries << ')' << '\n';
+  } else {
+    std::cout << "value out of range! (" << entries
+              << "; expected: " << expEntries << ')' << '\n';
+  }
+}
+
 void analysis() {
   TFile *resultFile = new TFile("result.root");
 
+  std::cout << '\n';
+  std::cout << "CHECKING ENTRIES-------------------------------------\n";
   TH1I *hIndex = (TH1I *)resultFile->Get("hIndex");
   check_entries(hIndex, 1E7, 0);
   TH1D *hPhi = (TH1D *)resultFile->Get("hPhi");
@@ -62,7 +80,18 @@ void analysis() {
   TH1D *hInvMassOppKpi = (TH1D *)resultFile->Get("hInvMassOppKpi");
   check_entries(hInvMassOppKpi, 41000000, 1E5);
   TH1D *hInvMassControl = (TH1D *)resultFile->Get("hInvMassControl");
-  check_entries(hInvMassControl, 1E5, 2000);
+  check_entries(hInvMassControl, 1E5, 1E3);
 
-	
+  std::cout << "\n\n";
+
+  std::cout << "CHECKING PARTICLE TYPES GENERATION-------------------\n";
+  check_bin_entries(hIndex, 1, 4E6, 1E5);    // pi+ (40%)
+  check_bin_entries(hIndex, 2, 4E6, 1E5);    // pi- (40%)
+  check_bin_entries(hIndex, 3, 5E5, 1E3);    // K+ (5%)
+  check_bin_entries(hIndex, 4, 5E5, 1E3);    // K- (5%)
+  check_bin_entries(hIndex, 5, 450000, 1E3); // p+ (4.5%)
+  check_bin_entries(hIndex, 6, 450000, 1E3); // p- (4.5%)
+  check_bin_entries(hIndex, 7, 1E5, 1E3);    // K* (1%)
+
+  
 }
