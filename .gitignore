@@ -6,3 +6,4 @@ main
 *.so
 *.exe
 *.root
+rere.cpp
