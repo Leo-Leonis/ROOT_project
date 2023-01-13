@@ -1,6 +1,9 @@
+#include "TCanvas.h"
+#include "TF1.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH1I.h"
+#include "TMath.h"
 
 #include <iostream>
 
@@ -52,6 +55,19 @@ void check_bin_entries(TH1 *histo, int bin, int expEntries, int range) {
   }
 }
 
+/// @brief User generated function corresponding to a uniform function.
+double_t uniform_function(double_t *x, double_t *param) {
+  double_t xx = x[0];
+  double_t value = param[0];
+  return value;
+}
+
+double_t exponential_function(double_t *x, double_t *param) {
+  double_t xx = x[0];
+  double_t value = TMath::Exp(param[0] + xx * param[1]);
+  return value;
+}
+
 void analysis() {
   TFile *resultFile = new TFile("result.root");
 
@@ -84,7 +100,7 @@ void analysis() {
 
   std::cout << "\n\n";
 
-  std::cout << "CHECKING PARTICLE TYPES GENERATION-------------------\n";
+  std::cout << "CHECKING PARTICLE TYPES GENERATION------------------------\n";
   check_bin_entries(hIndex, 1, 4E6, 1E5);    // pi+ (40%)
   check_bin_entries(hIndex, 2, 4E6, 1E5);    // pi- (40%)
   check_bin_entries(hIndex, 3, 5E5, 1E3);    // K+ (5%)
@@ -93,5 +109,44 @@ void analysis() {
   check_bin_entries(hIndex, 6, 450000, 1E3); // p- (4.5%)
   check_bin_entries(hIndex, 7, 1E5, 1E3);    // K* (1%)
 
-  
+  std::cout << "\n\n";
+
+  std::cout << "FITTING AND CHECKING ANGLE DISTRIBUTIONS------------------\n";
+
+  TF1 *unifPhi = new TF1("unifPhi", uniform_function, 0, TMath::TwoPi(), 1);
+  hPhi->Fit(unifPhi, "S, 0, Q"); // "0" for no plotting, "Q" for quiet mode
+  TF1 *unifTheta = new TF1("unifTheta", uniform_function, 0, TMath::Pi(), 1);
+  hTheta->Fit(unifTheta, "S, 0, Q");
+
+  TF1 *fitPhiRes = hPhi->GetFunction("unifPhi");
+  std::cout << "Phi fit results..." << '\n';
+  std::cout << "           Value: " << fitPhiRes->GetParameter(0) << " ± "
+            << fitPhiRes->GetParError(0) << '\n'
+            << "       Chi^2/NDF: "
+            << fitPhiRes->GetChisquare() / fitPhiRes->GetNDF() << '\n'
+            << "     Probability: " << fitPhiRes->GetProb() << '\n'
+            << '\n';
+
+  TF1 *fitThetaRes = hTheta->GetFunction("unifTheta");
+  std::cout << "Theta fit results..." << '\n';
+  std::cout << "           Value: " << fitThetaRes->GetParameter(0) << " ± "
+            << fitThetaRes->GetParError(0) << '\n'
+            << "       Chi^2/NDF: "
+            << fitThetaRes->GetChisquare() / fitThetaRes->GetNDF() << '\n'
+            << "     Probability: " << fitThetaRes->GetProb() << '\n';
+
+  std::cout << "\n\n";
+
+  std::cout << "FITTING AND CHECKING IMPULSE DISTRIBUTION-----------------\n";
+
+  TF1 *expImpMod = new TF1("expImpMod", exponential_function, 0, 6, 2);
+  hImpModule->Fit(expImpMod, "S, Q");
+  TF1 *fitImpModRes = hImpModule->GetFunction("expImpMod");
+
+  std::cout << "Impulse module fit results..." << '\n';
+  std::cout << "           Value: " << -fitImpModRes->GetParameter(1) << " ± "
+            << fitImpModRes->GetParError(1) << '\n'
+            << "       Chi^2/NDF: "
+            << fitImpModRes->GetChisquare() / fitImpModRes->GetNDF() << '\n'
+            << "     Probability: " << fitImpModRes->GetProb() << '\n';
 }
