@@ -55,19 +55,6 @@ void check_bin_entries(TH1 *histo, int bin, int expEntries, int range) {
   }
 }
 
-/// @brief User generated function corresponding to a uniform function.
-double_t uniform_function(double_t *x, double_t *param) {
-  double_t xx = x[0];
-  double_t value = param[0];
-  return value;
-}
-
-double_t exponential_function(double_t *x, double_t *param) {
-  double_t xx = x[0];
-  double_t value = TMath::Exp(param[0] + xx * param[1]);
-  return value;
-}
-
 void analysis() {
   TFile *resultFile = new TFile("result.root");
 
@@ -113,13 +100,13 @@ void analysis() {
 
   std::cout << "FITTING AND CHECKING ANGLE DISTRIBUTIONS------------------\n";
 
-  TF1 *unifPhi = new TF1("unifPhi", uniform_function, 0, TMath::TwoPi(), 1);
+  TF1 *unifPhi = new TF1("unifPhi", "pol 0", 0, TMath::TwoPi());
   hPhi->Fit(unifPhi, "S, 0, Q"); // "0" for no plotting, "Q" for quiet mode
-  TF1 *unifTheta = new TF1("unifTheta", uniform_function, 0, TMath::Pi(), 1);
+  TF1 *unifTheta = new TF1("unifTheta", "pol 0", 0, TMath::Pi());
   hTheta->Fit(unifTheta, "S, 0, Q");
 
   TF1 *fitPhiRes = hPhi->GetFunction("unifPhi");
-  std::cout << "Phi fit results..." << '\n';
+  std::cout << "INFO: Phi fit results..." << '\n';
   std::cout << "           Value: " << fitPhiRes->GetParameter(0) << " ± "
             << fitPhiRes->GetParError(0) << '\n'
             << "       Chi^2/NDF: "
@@ -128,7 +115,7 @@ void analysis() {
             << '\n';
 
   TF1 *fitThetaRes = hTheta->GetFunction("unifTheta");
-  std::cout << "Theta fit results..." << '\n';
+  std::cout << "INFO: Theta fit results..." << '\n';
   std::cout << "           Value: " << fitThetaRes->GetParameter(0) << " ± "
             << fitThetaRes->GetParError(0) << '\n'
             << "       Chi^2/NDF: "
@@ -139,14 +126,38 @@ void analysis() {
 
   std::cout << "FITTING AND CHECKING IMPULSE DISTRIBUTION-----------------\n";
 
-  TF1 *expImpMod = new TF1("expImpMod", exponential_function, 0, 6, 2);
-  hImpModule->Fit(expImpMod, "S, Q");
+  TF1 *expImpMod = new TF1("expImpMod", "expo", 0, 6);
+  hImpModule->Fit(expImpMod, "S, 0, Q");
   TF1 *fitImpModRes = hImpModule->GetFunction("expImpMod");
 
-  std::cout << "Impulse module fit results..." << '\n';
+  std::cout << "INFO: Impulse module fit results..." << '\n';
   std::cout << "           Value: " << -fitImpModRes->GetParameter(1) << " ± "
             << fitImpModRes->GetParError(1) << '\n'
             << "       Chi^2/NDF: "
             << fitImpModRes->GetChisquare() / fitImpModRes->GetNDF() << '\n'
             << "     Probability: " << fitImpModRes->GetProb() << '\n';
+
+  std::cout << "\n\n";
+
+  std::cout << "CHECKING INVARIANT MASS HISTOGRAMS------------------------\n";
+
+  TH1F *hSubAll = new TH1F(
+      "hSubAll", "Difference between opposite charge particles from same ones",
+      100, 0, 3);
+  TH1F *hSubKPi = new TH1F(
+      "hSubKPi",
+      "Difference between opposite charge Pi and K particles from same ones",
+      100, 0, 3);
+  hSubAll->Add(hInvMassOpp, hInvMass, 1, -1);
+  hSubKPi->Add(hInvMassOppKpi, hInvMassKpi, 1, -1);
+
+  TCanvas *canvas = new TCanvas();
+  canvas->Divide(1, 3);
+  canvas->cd(1);
+  hSubAll->Draw();
+  canvas->cd(2);
+  hSubKPi->Draw();
+  canvas->cd(3);
+  hInvMassControl->Draw();
+
 }
