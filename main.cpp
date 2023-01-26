@@ -3,12 +3,12 @@
 #include "ResonanceType.hpp"
 
 #include "TCanvas.h"
+#include "TFile.h"
 #include "TH1D.h"
 #include "TH1I.h"
 #include "TList.h"
 #include "TMath.h"
 #include "TRandom.h"
-#include "TFile.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -65,11 +65,13 @@ void program() {
       "Invariant Mass of oppos. charge between K and pi distr.", 100, 0, 3);
   hInvMassOppKpi->Sumw2();
   TH1D *hInvMassControl = new TH1D(
-      "hInvMassControl", "Invariant Mass control distribution", 100, 0, 2);
+      "hInvMassControl", "Invariant Mass control distribution", 100, 0, 3);
   hInvMassControl->Sumw2();
 
-  TCanvas *canvas = new TCanvas("c1", "c1", 1080, 720);
-  TCanvas *canvasInvMass = new TCanvas("c2", "c2", 1080, 720);
+  TCanvas *canvas =
+      new TCanvas("c1", "General purpose data histograms", 1080, 720);
+  TCanvas *canvasInvMass =
+      new TCanvas("c2", "Invariant mass histograms", 1080, 720);
 
   // In each event...
   for (int n_ev = 0; n_ev != nEvents; n_ev++) {
@@ -214,7 +216,6 @@ void program() {
 
   std::cout << '\n';
 
-
   canvas->Divide(2, 3);
   canvasInvMass->Divide(2, 3);
 
@@ -242,7 +243,7 @@ void program() {
   canvasInvMass->cd(5);
   hInvMassOppKpi->Draw();
   canvasInvMass->cd(6);
-  hInvMassControl->Fit("gaus"); // fit the control histogram
+  hInvMassControl->Fit("gaus", "S, Q"); // fit the control histogram
   hInvMassControl->Draw();
 
   // return 0;

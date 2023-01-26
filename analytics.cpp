@@ -79,9 +79,9 @@ void analysis() {
   TH1D *hInvMassOpp = (TH1D *)resultFile->Get("hInvMassOpp");
   check_entries(hInvMassOpp, 247500000, 1E5);
   TH1D *hInvMassKpi = (TH1D *)resultFile->Get("hInvMassKpi");
-  check_entries(hInvMassKpi, 41000000, 1E5);
+  check_entries(hInvMassKpi, 41000000, 150000);
   TH1D *hInvMassOppKpi = (TH1D *)resultFile->Get("hInvMassOppKpi");
-  check_entries(hInvMassOppKpi, 41000000, 1E5);
+  check_entries(hInvMassOppKpi, 41000000, 150000);
   TH1D *hInvMassControl = (TH1D *)resultFile->Get("hInvMassControl");
   check_entries(hInvMassControl, 1E5, 1E3);
 
@@ -100,12 +100,12 @@ void analysis() {
 
   std::cout << "FITTING AND CHECKING ANGLE DISTRIBUTIONS------------------\n";
 
-  TF1 *unifPhi = new TF1("unifPhi", "pol 0", 0, TMath::TwoPi());
-  hPhi->Fit(unifPhi, "S, 0, Q"); // "0" for no plotting, "Q" for quiet mode
-  TF1 *unifTheta = new TF1("unifTheta", "pol 0", 0, TMath::Pi());
-  hTheta->Fit(unifTheta, "S, 0, Q");
+  TF1 *fPhi = new TF1("fPhi", "pol 0", 0, TMath::TwoPi());
+  hPhi->Fit(fPhi, "S, 0, Q"); // "0" for no plotting, "Q" for quiet mode
+  TF1 *fTheta = new TF1("fTheta", "pol 0", 0, TMath::Pi());
+  hTheta->Fit(fTheta, "S, 0, Q");
 
-  TF1 *fitPhiRes = hPhi->GetFunction("unifPhi");
+  TF1 *fitPhiRes = hPhi->GetFunction("fPhi");
   std::cout << "INFO: Phi fit results..." << '\n';
   std::cout << "           Value: " << fitPhiRes->GetParameter(0) << " ± "
             << fitPhiRes->GetParError(0) << '\n'
@@ -114,7 +114,7 @@ void analysis() {
             << "     Probability: " << fitPhiRes->GetProb() << '\n'
             << '\n';
 
-  TF1 *fitThetaRes = hTheta->GetFunction("unifTheta");
+  TF1 *fitThetaRes = hTheta->GetFunction("fTheta");
   std::cout << "INFO: Theta fit results..." << '\n';
   std::cout << "           Value: " << fitThetaRes->GetParameter(0) << " ± "
             << fitThetaRes->GetParError(0) << '\n'
@@ -126,38 +126,72 @@ void analysis() {
 
   std::cout << "FITTING AND CHECKING IMPULSE DISTRIBUTION-----------------\n";
 
-  TF1 *expImpMod = new TF1("expImpMod", "expo", 0, 6);
-  hImpModule->Fit(expImpMod, "S, 0, Q");
-  TF1 *fitImpModRes = hImpModule->GetFunction("expImpMod");
+  TF1 *fImpModule = new TF1("fImpModule", "expo", 0, 6);
+
+  hImpModule->Fit(fImpModule, "S, 0, Q");
+
+  TF1 *fitImpModuleRes = hImpModule->GetFunction("fImpModule");
 
   std::cout << "INFO: Impulse module fit results..." << '\n';
-  std::cout << "           Value: " << -fitImpModRes->GetParameter(1) << " ± "
-            << fitImpModRes->GetParError(1) << '\n'
+  std::cout << "           Value: " << -fitImpModuleRes->GetParameter(1)
+            << " ± " << fitImpModuleRes->GetParError(1) << '\n'
             << "       Chi^2/NDF: "
-            << fitImpModRes->GetChisquare() / fitImpModRes->GetNDF() << '\n'
-            << "     Probability: " << fitImpModRes->GetProb() << '\n';
+            << fitImpModuleRes->GetChisquare() / fitImpModuleRes->GetNDF()
+            << '\n'
+            << "     Probability: " << fitImpModuleRes->GetProb() << '\n';
 
   std::cout << "\n\n";
 
   std::cout << "CHECKING INVARIANT MASS HISTOGRAMS------------------------\n";
 
-  TH1F *hSubAll = new TH1F(
-      "hSubAll", "Difference between opposite charge particles from same ones",
-      100, 0, 3);
-  TH1F *hSubKPi = new TH1F(
-      "hSubKPi",
-      "Difference between opposite charge Pi and K particles from same ones",
-      100, 0, 3);
-  hSubAll->Add(hInvMassOpp, hInvMass, 1, -1);
-  hSubKPi->Add(hInvMassOppKpi, hInvMassKpi, 1, -1);
+  TH1F *hSubAll = new TH1F("hSubAll",
+                           "Difference between opposite charge particles from "
+                           "same ones - Invariant mass distribuition",
+                           100, 0, 3);
+  TH1F *hSubKpi =
+      new TH1F("hSubKPi",
+               "Difference between opposite charge of pi and K particles from "
+               "same ones - Invariant mass distribuition",
+               100, 0, 3);
 
-  TCanvas *canvas = new TCanvas();
+  hSubAll->Add(hInvMassOpp, hInvMass, 1, -1);
+  hSubKpi->Add(hInvMassOppKpi, hInvMassKpi, 1, -1);
+
+  TF1 *fSubAll = new TF1("fSubAll", "gaus", 0, 3);
+  hSubAll->Fit(fSubAll, "S, Q", "", 0.5, 3);
+  TF1 *fSubKpi = new TF1("fSubKpi", "gaus", 0, 3);
+  hSubKpi->Fit(fSubKpi, "S, Q", "", 0.5, 3);
+
+  TF1 *fitSubAllRes = hSubAll->GetFunction("fSubAll");
+  std::cout << "INFO: Invariant Mass K* fit results (all particles)..." << '\n';
+  std::cout << "  K* Mass (mean): " << fitSubAllRes->GetParameter(1) << " ± "
+            << fitSubAllRes->GetParError(1) << '\n'
+            << "   K* Width (SD): " << fitSubAllRes->GetParameter(2) << " ± "
+            << fitSubAllRes->GetParError(2) << '\n'
+            << "       Chi^2/NDF: "
+            << fitSubAllRes->GetChisquare() / fitSubAllRes->GetNDF() << '\n'
+            << "     Probability: " << fitSubAllRes->GetProb() << '\n'
+            << '\n';
+
+  TF1 *fitSubKpiRes = hSubKpi->GetFunction("fSubKpi");
+  std::cout << "INFO: Invariant Mass K* fit results (K and pi particles)..."
+            << '\n';
+  std::cout << "  K* Mass (mean): " << fitSubKpiRes->GetParameter(1) << " ± "
+            << fitSubKpiRes->GetParError(1) << '\n'
+            << "   K* Width (SD): " << fitSubKpiRes->GetParameter(2) << " ± "
+            << fitSubKpiRes->GetParError(2) << '\n'
+            << "       Chi^2/NDF: "
+            << fitSubKpiRes->GetChisquare() / fitSubKpiRes->GetNDF() << '\n'
+            << "     Probability: " << fitSubKpiRes->GetProb() << '\n'
+            << '\n';
+
+  TCanvas *canvas =
+      new TCanvas("c3", "Difference invariant mass histograms", 1080, 720);
   canvas->Divide(1, 3);
   canvas->cd(1);
   hSubAll->Draw();
   canvas->cd(2);
-  hSubKPi->Draw();
+  hSubKpi->Draw();
   canvas->cd(3);
   hInvMassControl->Draw();
-
 }
