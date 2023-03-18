@@ -4,6 +4,7 @@
 #include "TH1D.h"
 #include "TH1I.h"
 #include "TMath.h"
+#include "TStyle.h"
 
 #include <iostream>
 
@@ -56,6 +57,10 @@ void check_bin_entries(TH1 *histo, int bin, int expEntries, int range) {
 }
 
 void analysis() {
+
+  gStyle->SetOptStat(2200);
+  gStyle->SetOptFit(1111);
+  
   TFile *resultFile = new TFile("result.root");
 
   std::cout << '\n';
@@ -99,11 +104,16 @@ void analysis() {
   std::cout << "\n\n";
 
   std::cout << "FITTING AND CHECKING ANGLE DISTRIBUTIONS------------------\n";
+  
+  TCanvas *canvas1 =
+      new TCanvas("c1", "Angle distribution", 1080, 720);
+  canvas1->Divide(1,2);
+  canvas1->cd(1);
 
   TF1 *fPhi = new TF1("fPhi", "pol 0", 0, TMath::TwoPi());
-  hPhi->Fit(fPhi, "S, 0, Q"); // "0" for no plotting, "Q" for quiet mode
+  hPhi->Fit(fPhi, "S, Q"); // "0" for no plotting, "Q" for quiet mode
   TF1 *fTheta = new TF1("fTheta", "pol 0", 0, TMath::Pi());
-  hTheta->Fit(fTheta, "S, 0, Q");
+  hTheta->Fit(fTheta, "S, Q");
 
   TF1 *fitPhiRes = hPhi->GetFunction("fPhi");
   std::cout << "INFO: Phi fit results..." << '\n';
@@ -124,11 +134,20 @@ void analysis() {
 
   std::cout << "\n\n";
 
+  hPhi->Draw("H");
+  hPhi->Draw("E, P, SAME");
+  canvas1->cd(2);
+  hTheta->Draw("H");
+  hTheta->Draw("E, P, SAME");
+
   std::cout << "FITTING AND CHECKING IMPULSE DISTRIBUTION-----------------\n";
+  
+  TCanvas *canvas2 =
+      new TCanvas("c2", "Impulse distribution", 1080, 360);
 
   TF1 *fImpModule = new TF1("fImpModule", "expo", 0, 6);
+  hImpModule->Fit(fImpModule, "S, Q");
 
-  hImpModule->Fit(fImpModule, "S, 0, Q");
 
   TF1 *fitImpModuleRes = hImpModule->GetFunction("fImpModule");
 
@@ -142,7 +161,15 @@ void analysis() {
 
   std::cout << "\n\n";
 
+  hImpModule->Draw("H");
+  hImpModule->Draw("E, P, SAME");
+
   std::cout << "CHECKING INVARIANT MASS HISTOGRAMS------------------------\n";
+  
+  TCanvas *canvas3 =
+      new TCanvas("c3", "Difference invariant mass histograms", 1080, 720);
+  canvas3->Divide(1, 2);
+  canvas3->cd(1);
 
   TH1F *hSubAll = new TH1F("hSubAll",
                            "Difference between opposite charge particles from "
@@ -185,13 +212,14 @@ void analysis() {
             << "     Probability: " << fitSubKpiRes->GetProb() << '\n'
             << '\n';
 
-  TCanvas *canvas =
-      new TCanvas("c3", "Difference invariant mass histograms", 1080, 720);
-  canvas->Divide(1, 3);
-  canvas->cd(1);
-  hSubAll->Draw();
-  canvas->cd(2);
-  hSubKpi->Draw();
-  canvas->cd(3);
+  canvas3->cd(1);
+  hSubAll->Draw("H");
+  hSubAll->Draw("E, P, SAME");
+  canvas3->cd(2);
+  hSubKpi->Draw("H");
+  hSubKpi->Draw("E, P, SAME");
+
+  TCanvas *canvas4 =
+      new TCanvas("c4", "Invariant Mass control histogram", 1080, 360);
   hInvMassControl->Draw();
 }
