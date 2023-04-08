@@ -1,0 +1,53 @@
+In questo progetto si è andati ad utilizzare la programmazione ad oggetti, e più in particolare l'\textbf{ereditarietà virtuale} e l'\textbf{aggregazione}.
+
+\subsection*{Le classi \texttt{ParticleType} e \texttt{ResonanceType}}
+Nella simulazione si hanno due categorie di particelle: quelli ordinari e le risonanze. Avendo queste ultime una caratteristica aggiuntiva rispetto a quelle ordinarie (cioè la larghezza di risonanza), allora si è pensato di creare una classe \verb|ParticleType| associato ai tipi particelle ordinarie e da questa si è andati a ereditare la classe \verb|ResonanceType|, associata alla tipologia di risonanza. \verb|ParticleType| possiede \textbf{tre attributi privati}:
+\begin{itemize}
+    \item \verb|std::string fName|: indica il \textbf{nome} del tipo di particella;
+    \item \verb|double fMass|: indica il valore di \textbf{massa} (in GeV/c$^2$);
+    \item \verb|int fCharge|: indica il valore di \textbf{carica} ($\pm$\textit{e}).
+\end{itemize}
+\verb|ResonanceType| include anche l'attributo privato \verb|double fWidth| che indica la \textbf{larghezza}.\\
+Per ognuno di questi parametri c'è un metodo che ritorna il valore se richiesto (\verb|GetName()|, \verb|GetMass()|, \verb|GetCharge()|, \verb|GetWidth()|).
+
+\subsection*{La classe \texttt{Particle}}
+
+Alla generazione di una particella dobbiamo specificare le sue caratteristiche di base e le proprietà cinematiche (quantità di moto e direzione). Per far ciò si potrebbero attribuire le singole caratteristiche associato al tipo di particella, ma ciò è dispendioso per la memoria ed è meglio attribuire semplicemente il tipo di particella.\\
+
+Utilizzando l'aggregazione del codice si è creato una classe \verb|Particle| che descrive queste caratteristiche, contenendo in privato:
+\begin{itemize}
+    \item \verb|static std::vector<ParticleType> fParticleType|: una \textbf{lista} (contenitore) di tutti i tipi di particelle creati;
+    \item \verb|int fIndex|: un \textbf{numero} che identifica la tipologia di particella in base alla sua posizione in \verb|fParticleType|;
+    \item \verb|Vector3d fImpulse|: un \textbf{vettore 3-dim} che racchiude i tre componenti dell'impulso.
+\end{itemize}
+Inoltre in questa classe troviamo diversi metodi, sia privati che pubblici:
+\begin{itemize}
+    \item metodi che ritornano i parametri singoli della particella corrente (indice del tipo di particella, vettore dell'impulso, massa, carica);
+    \item metodi che impostano i parametri alla particella corrente (tipo di particella, impulso);
+    \item \verb|int FindParticle(...)|: ritorna l'indice del tipo della particella in base al nome dato in input;
+    \item \verb|void AddParticleType(...)|: aggiunge un tipo di particella in \verb|fParticleType|;
+    \item \verb|double GetEnergy()|: ritorna il valore dell'energia della particella corrente, secondo l'equazione
+    
+    $$ E = \sqrt{m^2 + |\Vec{p}|^2} $$
+    
+    con $E$ l'energia, $m$ la massa, $|\Vec{p}|$ il modulo dell'impulso;
+    \item \verb|double InvMass(...)|: ritorna il valore della massa invariante tra quella corrente e un'altra particella, secondo
+    
+    $$ M_{inv} = \sqrt{(E_1 + E_2)^2 - (\vec{p_1} + \vec{p_2})^2} $$
+    
+    con $M_{inv}$ la massa invariante, $E_i$ e $\Vec{p_i}$ rispettivamente l'energia e vettore dell'impulso della particella $i$;
+    \item \verb|double Decay2Body(...)|: simula il decadimento della particella corrente in altre due; 
+\end{itemize}
+
+Un altro punto fondamentale di questo progetto è la \textbf{modularità} del codice: per ogni classe sono stati definiti un file di intestazione e uno d'implementazione (quindi 6 file complessivamente), che, una volta compilati, sono stati resi come librerie dinamiche per un maggior efficacia nel fase del linking.\\
+
+\subsection*{Il file \texttt{main.cpp}}
+
+Le librerie create sono stati utilizzati nel file \verb|main.cpp|, in cui si esegue la parte di simulazione del programma.\\
+Ciò consiste in simulazione di eventi di collisione in cui vengono generati un numero fisso di particelle (\verb|Particle|) per evento. Per ogni generazione di  particella le vengono attribuite casualmente un impulso con direzione e verso (\verb|fImpulse|), le viene assegnato la tipologia di particella (\verb|fIndex|) secondo una distribuzione definita dall'utente e infine, se viene generato una risonanza, questa viene fatto decadere in altre due.\\
+Durante le generazioni in un evento vengono raccolti dati in istogrammi che poi andranno ad essere analizzati successivamente. I dati che vengono raccolti di una particella generata sono il tipo di particella, la distribuzione degli angoli dell'impulso (azimutale e polare), il modulo dell'impulso totale e trasversa e l'energia. Alla fine di un evento vengono valutati anche le masse invarianti tra le particelle, in particolare quelle derivanti tra tutte le particelle, tra tutte le particelle di segno concorde e di segno opposto, tra particelle K e $\pi$ di segno concorde  e di segno opposto e infine tra particelle entrambi generate da uno stesso decadimento di un K$^*$. 
+Alla fine dell'esecuzione del programma vengono mostrati e salvati i dati della simulazione effettuata.\\
+
+\subsection*{Il file \texttt{analytics.cpp}}
+Infine, una volta salvati i dati della simulazione, questi vengono analizzati e fittati.
+In particolare vengono analizzati e valutati il numero di particelle generati per tipo, i parametri della particella (angoli e modulo dell'impulso) e le masse invarianti. Da queste analisi si cerca di rilevare il segnale di K$^*$ che verrà generato con frequenza molto minore rispetto ad altre particelle.\\

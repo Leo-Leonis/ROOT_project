@@ -1,0 +1,26 @@
+Nel programma vengono generati 10 000 eventi, in ognuno dei quali vengono generati 100 particelle.\\
+Le particelle in totale sono 7, con i tipi, le caratteristiche e la distribuzione delle particelle generate raccolte nella tabella \ref{tab:particles}.
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{||c|c|c|c|c||}
+        \hline \hline
+        \multicolumn{5}{||c||}{\textsc{tipo, caratteristiche e distribuzione delle particelle}} \\
+        \hline \hline
+        tipo & presenza & massa [GeV/c$^2$] & carica [$e$] & larghezza [GeV/c$^2$]\\
+        \hline
+        $\pi^\pm$ & 40\% & 0.13957 & $\pm1$ & $-$\\
+        K$^\pm$ & 5\% & 0.49367 & $\pm1$ & $-$\\
+        p$^\pm$ & 4.5\% & 0.93827 & $\pm1$ & $-$\\
+        K$^*$ & 1\% & 0.89166 & 0 & 0.050\\
+        \hline \hline 
+    \end{tabular}
+    \caption[\small Tipo, caratteristiche e distribuzione delle particelle]{\small Il tipo, le caratteristiche e la loro distribuzione nelle simulazioni, con $\pi^\pm$ pioni, K$^\pm$ kaoni, p$^\pm$ protoni e  K$^*$ la particella di risonanza. La sezione "presenza" indica la distribuzione nella simulazione per evento.}
+    \label{tab:particles}
+\end{table}
+Per quanto riguarda invece l'impulso $\Vec{p}$ delle particelle il suo modulo segue una distribuzione esponenziale decrescente con media $<|\Vec{p}|>$ = 1 GeV, mentre la distribuzione degli angoli (in coordinate sferiche) seguono secondo lo schema:
+\begin{itemize}
+    \item angolo azimutale $\phi$ con distribuzione uniforme tra [0, $2\pi$];
+    \item angolo polare $\theta$ con distribuzione uniforme tra [0, $\pi$];
+\end{itemize}
+Nel caso in cui la particella generata sia un K$^*$, questa, prima della raccolta dati, decade subito in altre due particelle che possono essere o un $\pi^+$ e un K$^-$, oppure un $\pi^-$ e un K$^+$, con probabilità 50\% in entrambi i casi. Queste due particelle inoltre, attraverso la funzione \verb|Decay2Body(...)|, assumono un impulso casuale ciascuno ma tale che siano rispettate le leggi della fisica. Inoltre ciò vuol dire che al termine di un evento si possono aver più di 100 particelle. 

@@ -1,3 +1,14 @@
+\sethlcolor{blue}
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=0.9,
+bgcolor=bg,
+%fontsize=\small,
+fontfamily=tt,
+linenos,
+escapeinside=||,
+]{cpp}
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TFile.h"
@@ -8,11 +19,8 @@
 
 #include <iostream>
 
-/// @brief Check the entries of an histogram with an accepted range,
-/// and prints out the results.
-/// @param histo the histogram pointer
-/// @param expEntries the number of expected entries
-/// @param range the accepted error range
+// Check the entries of an histogram with an accepted range,
+// and prints out the results.
 void check_entries(TH1 *histo, int expEntries, int range) {
   int entries = histo->GetEntries(); // number of entries
 
@@ -39,10 +47,7 @@ void check_entries(TH1 *histo, int expEntries, int range) {
   }
 }
 
-/// @brief Function that checks the number of entries of a specified bin.
-/// @param histo the histogram pointer
-/// @param bin the number associated to the bin
-/// @param expEntries the number of expected entries
+// Function that checks the number of entries of a specified bin.
 void check_bin_entries(TH1 *histo, int bin, int expEntries) {
   int entries = histo->GetBinContent(bin);
   std::cout << "INFO: checking " << histo->GetName() << ", bin " << bin << ": "
@@ -260,3 +265,4 @@ void analysis() {
   canvas2->Print("canvas2.C");
   canvas2->Print("canvas2.root");
 }
+\end{minted}

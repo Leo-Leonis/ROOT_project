@@ -1,9 +1,10 @@
 .vscode/
 a.out
 main
-rere.cpp
 *.pcm
 *.d
 *.so
 *.exe
 *.root
+*.C
+*.png

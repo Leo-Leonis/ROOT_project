@@ -1,0 +1,93 @@
+\documentclass{article}
+
+% pacchetti
+\usepackage[utf8]{inputenc} 
+\usepackage[italian]{babel}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx} % per le immagini
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{wrapfig} % per le immagini incorniciate con il testo
+\usepackage{fancyhdr} % per i headings e footers
+\usepackage{eurosym} % per il simbolo dell'euro "€" più carino
+\usepackage{appendix}
+\usepackage{geometry}
+\usepackage{extpfeil}
+\usepackage{tikz}
+%\usetikzlibrary{patterns,plotmarks} %per usare root con tikz
+\usepackage{multirow}
+\usepackage{multicol} % per avere elenchi a più colonne
+\usepackage{enumitem}
+\usepackage{soul} % per highlight migliore
+
+\usepackage{minted}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\definecolor{green}{rgb}{0,.66,0}
+\definecolor{white}{rgb}{1, 1, 1}
+
+
+% impostazioni del pacchetto fancyhdr
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\sc ye leandro}
+\lhead{Relazione \texttt{ROOT\textunderscore project}}
+\fancyfoot[c]{\thepage}
+
+\begin{document}
+
+
+%\thispagestyle{plain} % per ignorare per questa pagina le impostazioni fancy
+\thispagestyle{empty} % per disattivare per questa pagina le impostazioni fancy e anche il numero della pagina
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{image/logo.png}
+    \label{Logo}
+\end{figure}
+
+\vspace{2cm}
+
+\section*{\centering \Huge \bf Relazione \texttt{ROOT\textunderscore project}}
+
+\vspace{3cm}
+
+\begin{center}
+{\large Realizzato da} \\
+\vspace{2cm}
+{\Large \textsc{Leandro Ye}}    
+\end{center}
+
+\vspace{3cm}
+
+\begin{center}
+    {\large 8 aprile 2023}
+\end{center}
+
+\newpage
+
+\section{Introduzione}
+
+\input{tex/1-Introduzione.tex}
+
+\section{Struttura del codice} 
+
+\input{tex/2-Struttura del codice.tex}
+
+\section{Generazione}
+
+\input{tex/3-Generazione.tex}
+
+\section{Analisi}
+
+\input{tex/4-Analisi.tex}
+
+\newpage
+\section*{Appendice}
+\appendix
+
+\input{tex/A-Codice}
+
+\end{document}
